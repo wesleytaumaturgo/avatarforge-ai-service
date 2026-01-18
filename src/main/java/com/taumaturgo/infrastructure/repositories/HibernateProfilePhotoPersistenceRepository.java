@@ -1,0 +1,23 @@
+package com.taumaturgo.infrastructure.repositories;
+
+import com.taumaturgo.domain.models.ProfilePhoto;
+import com.taumaturgo.domain.repositories.ProfilePhotoPersistenceRepository;
+import com.taumaturgo.infrastructure.repositories.entities.CustomerProfilePhotos;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+
+@ApplicationScoped
+public class HibernateProfilePhotoPersistenceRepository implements ProfilePhotoPersistenceRepository {
+    private final EntityManager entityManager;
+
+    public HibernateProfilePhotoPersistenceRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    @Override
+    @Transactional
+    public void save(String customerId, ProfilePhoto profilePhoto) {
+        entityManager.merge(CustomerProfilePhotos.fromDomain(customerId, profilePhoto));
+    }
+}
