@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS profile_photo_jobs (
+  id VARCHAR(36) NOT NULL,
+  customer_id VARCHAR(36) NOT NULL,
+  profile_photo_id VARCHAR(36) NOT NULL,
+  original_photo_path VARCHAR(255),
+  generated_photo_url VARCHAR(255),
+  status VARCHAR(30) NOT NULL,
+  error VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
