@@ -67,3 +67,28 @@ Stubs Mutiny gerados em `target/generated-sources/grpc`.
 
 ## Testes
 - `src/test/java/com/taumaturgo/infrastructure/async/ProfilePhotoAsyncProcessorTest.java` cobre fluxo assíncrono (status DONE, cleanup, callback).
+
+### Como testar rapidamente (manual)
+1) Subir em dev: `./mvnw quarkus:dev` (devservices sobem MariaDB/S3 fake).
+2) Upload de foto (REST):
+```bash
+curl -i -F "photo=@/caminho/para/foto.png" -F "callbackUrl=http://localhost:9000/hook" \
+  http://localhost:8080/customers/{customerId}
+```
+Anote `Location` e `jobId` do JSON retornado.
+3) Polling/long-poll:
+```bash
+curl "http://localhost:8080/customers/{customerId}/photos/{jobId}/status?waitSeconds=10"
+```
+4) SSE:
+```bash
+curl -N http://localhost:8080/customers/{customerId}/photos/stream
+```
+5) gRPC (com `grpcurl`):
+```bash
+grpcurl -plaintext -d '{"job_id":"{jobId}","wait_seconds":5}' \
+  localhost:9000 com.taumaturgo.grpc.ProfilePhotoJobGrpc/GetStatus
+grpcurl -plaintext -d '{"customer_id":"{customerId}"}' \
+  localhost:9000 com.taumaturgo.grpc.ProfilePhotoJobGrpc/StreamStatus
+```
+6) Webhook: simule um receptor local (ex.: `nc -l 9000`) e envie `callbackUrl=http://host.docker.internal:9000/hook` no upload.
